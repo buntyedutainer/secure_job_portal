@@ -1,0 +1,27 @@
+Table User {
+  id integer [primary key]
+  name varchar
+  email varchar [unique]
+  password_hash varchar
+  role varchar [note: 'student / recruiter / admin']
+  created_at timestamp
+}
+
+Table Posting {
+  id integer [primary key]
+  title varchar
+  description text
+  requirements text
+  company_name varchar
+  posted_by integer [ref: > User.id]
+  status varchar [note: 'open / closed']
+  created_at timestamp
+}
+
+Table Application {
+  id integer [primary key]
+  student_id integer [ref: > User.id]
+  posting_id integer [ref: > Posting.id]
+  status varchar [note: 'pending / accepted / rejected']
+  applied_at timestamp
+}
