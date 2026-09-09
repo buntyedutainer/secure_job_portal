@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Postings from './pages/Postings';
+import PostingDetail from './pages/PostingDetail';
 
 function App() {
   return (
@@ -17,10 +18,11 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/postings" element={<Postings />} />
+          <Route path="/postings/:id" element={<PostingDetail />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
 }
 
-export default App;
+export default App; 
