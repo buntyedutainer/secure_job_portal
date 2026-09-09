@@ -1,11 +1,13 @@
 import os
 from flask import Flask, jsonify, request
-from models import db, Posting
+from models import db, Posting, User
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'portal.db')
 db.init_app(app)
+bcrypt = Bcrypt(app)
 
 with app.app_context():
     db.create_all()
@@ -74,6 +76,36 @@ def delete_posting(posting_id):
     db.session.commit() 
     return jsonify({"message": "Posting deleted"})
 
+@app.route('/register', methods=['POST']) 
+def register(): 
+    data = request.get_json() 
+    existing_user = User.query.filter_by(email=data['email']).first() 
+    if existing_user: 
+        return jsonify({"error": "Email already registered"}), 409 
+
+    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8') 
+    new_user = User( 
+        name=data['name'], 
+        email=data['email'], 
+        password_hash=hashed_password, 
+        role=data['role'] 
+    ) 
+
+    db.session.add(new_user) 
+    db.session.commit() 
+    return jsonify({"message": "User registered", "id": new_user.id}), 201
+
+@app.route('/login', methods=['POST']) 
+def login(): 
+    data = request.get_json() 
+    user = User.query.filter_by(email=data['email']).first() 
+    if not user or not bcrypt.check_password_hash(user.password_hash, data['password']): 
+        return jsonify({"error": "Invalid email or password"}), 401 
+    return jsonify({
+        "message": "Login successful", 
+        "user_id": user.id, 
+        "role": user.role
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
