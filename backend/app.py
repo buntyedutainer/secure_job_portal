@@ -2,12 +2,15 @@ import os
 from flask import Flask, jsonify, request
 from models import db, Posting, User
 from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'portal.db')
 db.init_app(app)
 bcrypt = Bcrypt(app)
+app.config['JWT_SECRET_KEY'] = 'change-this-to-a-random-secret-later' 
+jwt = JWTManager(app)
 
 with app.app_context():
     db.create_all()
@@ -18,14 +21,16 @@ def home():
     return jsonify({"message": "API is running"})
 
 @app.route('/postings', methods=['POST'])
+@jwt_required()
 def create_posting():
+    current_user_id = get_jwt_identity()
     data = request.get_json()
     new_posting = Posting(
         title=data['title'],
         description=data['description'],
         requirements=data.get('requirements', ''),
         company_name=data['company_name'],
-        posted_by=data['posted_by']
+        posted_by=current_user_id
     )
     db.session.add(new_posting)
     db.session.commit()
@@ -101,10 +106,12 @@ def login():
     user = User.query.filter_by(email=data['email']).first() 
     if not user or not bcrypt.check_password_hash(user.password_hash, data['password']): 
         return jsonify({"error": "Invalid email or password"}), 401 
-    return jsonify({
+    access_token = create_access_token(identity=str(user.id)) 
+    return jsonify({ 
         "message": "Login successful", 
+        "access_token": access_token, 
         "user_id": user.id, 
-        "role": user.role
+        "role": user.role 
     })
 
 if __name__ == '__main__':
