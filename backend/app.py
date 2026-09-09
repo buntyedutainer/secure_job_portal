@@ -65,21 +65,29 @@ def get_posting(posting_id):
         "status": p.status
     })
 
-@app.route('/postings/<int:posting_id>', methods=['PUT']) 
-def update_posting(posting_id): 
-    p = Posting.query.get_or_404(posting_id) 
-    data = request.get_json() 
-    p.title = data.get('title', p.title) 
-    p.description = data.get('description', p.description) 
-    p.requirements = data.get('requirements', p.requirements) 
-    p.company_name = data.get('company_name', p.company_name) 
-    p.status = data.get('status', p.status) 
-    db.session.commit() 
+@app.route('/postings/<int:posting_id>', methods=['PUT'])
+@jwt_required()
+def update_posting(posting_id):
+    current_user_id = get_jwt_identity()
+    p = Posting.query.get_or_404(posting_id)
+    if str(p.posted_by) != current_user_id:
+        return jsonify({"error": "Not authorized to edit this posting"}), 403
+    data = request.get_json()
+    p.title = data.get('title', p.title)
+    p.description = data.get('description', p.description)
+    p.requirements = data.get('requirements', p.requirements)
+    p.company_name = data.get('company_name', p.company_name)
+    p.status = data.get('status', p.status)
+    db.session.commit()
     return jsonify({"message": "Posting updated"})
 
-@app.route('/postings/<int:posting_id>', methods=['DELETE']) 
+@app.route('/postings/<int:posting_id>', methods=['DELETE'])
+@jwt_required() 
 def delete_posting(posting_id): 
+    current_user_id = get_jwt_identity()
     p = Posting.query.get_or_404(posting_id) 
+    if str(p.posted_by) != current_user_id:
+        return jsonify({"error": "Not authorized to delete this posting"}), 403
     db.session.delete(p) 
     db.session.commit() 
     return jsonify({"message": "Posting deleted"})
@@ -151,6 +159,41 @@ def my_applications():
             "company_name": posting.company_name if posting else "Unknown",
             "status": a.status
         })
+    return jsonify(result)
+
+@app.route('/my-postings', methods=['GET']) 
+@jwt_required() 
+def my_postings(): 
+    current_user_id = get_jwt_identity() 
+    postings = Posting.query.filter_by(posted_by=current_user_id).all() 
+    result = [] 
+    for p in postings: 
+        result.append({ 
+            "id": p.id, 
+            "title": p.title, 
+            "company_name": p.company_name, 
+            "status": p.status 
+        }) 
+    return jsonify(result)
+
+@app.route('/postings/<int:posting_id>/applicants', methods=['GET']) 
+@jwt_required() 
+def get_applicants(posting_id): 
+    current_user_id = get_jwt_identity() 
+    posting = Posting.query.get_or_404(posting_id) 
+    if str(posting.posted_by) != current_user_id: 
+        return jsonify({"error": "Not authorized to view applicants for this posting"}), 403 
+    
+    applications = Application.query.filter_by(posting_id=posting_id).all() 
+    result = [] 
+    for a in applications: 
+        student = User.query.get(a.student_id) 
+        result.append({ 
+            "application_id": a.id, 
+            "student_name": student.name if student else "Unknown", 
+            "student_email": student.email if student else "Unknown", 
+            "status": a.status 
+        }) 
     return jsonify(result)
 
 if __name__ == '__main__':
