@@ -55,6 +55,25 @@ def get_posting(posting_id):
         "status": p.status
     })
 
+@app.route('/postings/<int:posting_id>', methods=['PUT']) 
+def update_posting(posting_id): 
+    p = Posting.query.get_or_404(posting_id) 
+    data = request.get_json() 
+    p.title = data.get('title', p.title) 
+    p.description = data.get('description', p.description) 
+    p.requirements = data.get('requirements', p.requirements) 
+    p.company_name = data.get('company_name', p.company_name) 
+    p.status = data.get('status', p.status) 
+    db.session.commit() 
+    return jsonify({"message": "Posting updated"})
+
+@app.route('/postings/<int:posting_id>', methods=['DELETE']) 
+def delete_posting(posting_id): 
+    p = Posting.query.get_or_404(posting_id) 
+    db.session.delete(p) 
+    db.session.commit() 
+    return jsonify({"message": "Posting deleted"})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
