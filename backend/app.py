@@ -4,6 +4,7 @@ from models import db, Posting, User
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
+from models import db, Posting, User, Application
 
 app = Flask(__name__)
 CORS(app)
@@ -115,6 +116,42 @@ def login():
         "user_id": user.id, 
         "role": user.role 
     })
+
+@app.route('/applications', methods=['POST'])
+@jwt_required()
+def apply_to_posting():
+    current_user_id = get_jwt_identity()
+    data = request.get_json()
+    posting_id = data['posting_id']
+
+    existing = Application.query.filter_by(student_id=current_user_id, posting_id=posting_id).first()
+    if existing:
+        return jsonify({"error": "You already applied to this posting"}), 409
+
+    new_application = Application(
+        student_id=current_user_id,
+        posting_id=posting_id
+    )
+    db.session.add(new_application)
+    db.session.commit()
+    return jsonify({"message": "Application submitted", "id": new_application.id}), 201
+
+@app.route('/my-applications', methods=['GET'])
+@jwt_required()
+def my_applications():
+    current_user_id = get_jwt_identity()
+    applications = Application.query.filter_by(student_id=current_user_id).all()
+    result = []
+    for a in applications:
+        posting = Posting.query.get(a.posting_id)
+        result.append({
+            "application_id": a.id,
+            "posting_id": a.posting_id,
+            "posting_title": posting.title if posting else "Unknown",
+            "company_name": posting.company_name if posting else "Unknown",
+            "status": a.status
+        })
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
