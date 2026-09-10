@@ -1,6 +1,5 @@
 import os
 from flask import Flask, jsonify, request
-from models import db, Posting, User
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
@@ -182,8 +181,8 @@ def get_applicants(posting_id):
     current_user_id = get_jwt_identity() 
     posting = Posting.query.get_or_404(posting_id) 
     if str(posting.posted_by) != current_user_id: 
-        return jsonify({"error": "Not authorized to view applicants for this posting"}), 403 
-    
+        return jsonify({"error": "Not authorized to view applicants for this posting"}), 403
+
     applications = Application.query.filter_by(posting_id=posting_id).all() 
     result = [] 
     for a in applications: 
@@ -195,6 +194,76 @@ def get_applicants(posting_id):
             "status": a.status 
         }) 
     return jsonify(result)
+
+@app.route('/admin/postings', methods=['GET']) 
+@jwt_required() 
+def admin_get_postings(): 
+    current_user_id = get_jwt_identity() 
+    user = User.query.get(current_user_id) 
+    if not user or user.role != 'admin': 
+        return jsonify({"error": "Admin access required"}), 403 
+
+    postings = Posting.query.all() 
+    result = [] 
+    for p in postings: 
+        result.append({ 
+            "id": p.id, 
+            "title": p.title, 
+            "company_name": p.company_name, 
+            "status": p.status, 
+            "posted_by": p.posted_by 
+        }) 
+    return jsonify(result) 
+
+@app.route('/admin/postings/<int:posting_id>/status', methods=['PUT']) 
+@jwt_required() 
+def admin_update_posting_status(posting_id): 
+    current_user_id = get_jwt_identity() 
+    user = User.query.get(current_user_id) 
+    if not user or user.role != 'admin': 
+        return jsonify({"error": "Admin access required"}), 403 
+
+    p = Posting.query.get_or_404(posting_id) 
+    data = request.get_json() 
+    p.status = data.get('status', p.status) 
+    db.session.commit() 
+    return jsonify({"message": "Posting status updated"})
+
+@app.route('/admin/users', methods=['GET']) 
+@jwt_required() 
+def admin_get_users(): 
+    current_user_id = get_jwt_identity() 
+    user = User.query.get(current_user_id) 
+    if not user or user.role != 'admin': 
+        return jsonify({"error": "Admin access required"}), 403 
+    
+    users = User.query.all() 
+    result = [] 
+    for u in users: 
+        result.append({ 
+            "id": u.id, 
+            "name": u.name, 
+            "email": u.email, 
+            "role": u.role, 
+            "is_active": u.is_active 
+        }) 
+    return jsonify(result)
+
+@app.route('/admin/users/<int:user_id>/toggle-active', methods=['PUT']) 
+@jwt_required() 
+def admin_toggle_user(user_id): 
+    current_user_id = get_jwt_identity() 
+    admin_user = User.query.get(current_user_id) 
+    if not admin_user or admin_user.role != 'admin': 
+        return jsonify({"error": "Admin access required"}), 403 
+
+    target_user = User.query.get_or_404(user_id) 
+    target_user.is_active = not target_user.is_active 
+    db.session.commit() 
+    return jsonify({
+        "message": "User status updated", 
+        "is_active": target_user.is_active
+        })
 
 if __name__ == '__main__':
     app.run(debug=True)
