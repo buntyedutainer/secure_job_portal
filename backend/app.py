@@ -5,9 +5,15 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_cors import CORS
 from models import db, Posting, User, Application
 from dotenv import load_dotenv
+from marshmallow import Schema, fields, ValidationError, validate
 
 load_dotenv()
 app = Flask(__name__)
+class RegisterSchema(Schema): 
+    name = fields.Str(required=True) 
+    email = fields.Email(required=True) 
+    password = fields.Str(required=True, validate=validate.Length(min=8)) 
+    role = fields.Str(required=True, validate=validate.OneOf(['student', 'recruiter']))
 CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'portal.db')
@@ -93,23 +99,27 @@ def delete_posting(posting_id):
     db.session.commit() 
     return jsonify({"message": "Posting deleted"})
 
-@app.route('/register', methods=['POST']) 
-def register(): 
-    data = request.get_json() 
-    existing_user = User.query.filter_by(email=data['email']).first() 
-    if existing_user: 
-        return jsonify({"error": "Email already registered"}), 409 
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    try:
+        RegisterSchema().load(data)
+    except ValidationError as err:
+        return jsonify({"error": err.messages}), 400
 
-    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8') 
-    new_user = User( 
-        name=data['name'], 
-        email=data['email'], 
-        password_hash=hashed_password, 
-        role=data['role'] 
-    ) 
+    existing_user = User.query.filter_by(email=data['email']).first()
+    if existing_user:
+        return jsonify({"error": "Email already registered"}), 409
 
-    db.session.add(new_user) 
-    db.session.commit() 
+    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    new_user = User(
+        name=data['name'],
+        email=data['email'],
+        password_hash=hashed_password,
+        role=data['role']
+    )
+    db.session.add(new_user)
+    db.session.commit()
     return jsonify({"message": "User registered", "id": new_user.id}), 201
 
 @app.route('/login', methods=['POST']) 
