@@ -9,6 +9,7 @@ from marshmallow import Schema, fields, ValidationError, validate
 from flask_limiter import Limiter 
 from flask_limiter.util import get_remote_address 
 from flask_talisman import Talisman 
+from datetime import datetime, timedelta
 
 load_dotenv()
 app = Flask(__name__)
@@ -133,18 +134,29 @@ def register():
 
 @app.route('/login', methods=['POST']) 
 @limiter.limit("5 per minute") 
-def login():
+def login(): 
     data = request.get_json() 
     user = User.query.filter_by(email=data['email']).first() 
-    if not user or not bcrypt.check_password_hash(user.password_hash, data['password']): 
+    if not user: 
         return jsonify({"error": "Invalid email or password"}), 401 
+    if user.locked_until and user.locked_until > datetime.utcnow(): 
+        return jsonify({"error": "Account temporarily locked. Try again later."}), 403 
+    if not bcrypt.check_password_hash(user.password_hash, data['password']): 
+        user.failed_login_attempts = (user.failed_login_attempts or 0) + 1 
+        if user.failed_login_attempts >= 5: 
+            user.locked_until = datetime.utcnow() + timedelta(minutes=15) 
+        db.session.commit() 
+        return jsonify({"error": "Invalid email or password"}), 401 
+    user.failed_login_attempts = 0 
+    user.locked_until = None 
+    db.session.commit() 
     access_token = create_access_token(identity=str(user.id)) 
     return jsonify({ 
         "message": "Login successful", 
         "access_token": access_token, 
         "user_id": user.id, 
         "role": user.role 
-    })
+        })
 
 @app.route('/applications', methods=['POST'])
 @jwt_required()
