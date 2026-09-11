@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from marshmallow import Schema, fields, ValidationError, validate
 from flask_limiter import Limiter 
 from flask_limiter.util import get_remote_address 
+from flask_talisman import Talisman 
 
 load_dotenv()
 app = Flask(__name__)
@@ -24,6 +25,10 @@ bcrypt = Bcrypt(app)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY') 
 jwt = JWTManager(app)
 limiter = Limiter( get_remote_address, app=app, default_limits=["200 per day", "50 per hour"] )
+Talisman(app, force_https=False, content_security_policy={ 
+    'default-src': "'self'", 
+    'script-src': "'self'", 
+    'style-src': ["'self'", "'unsafe-inline'"] })
 
 with app.app_context():
     db.create_all()
