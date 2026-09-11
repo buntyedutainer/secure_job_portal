@@ -6,6 +6,8 @@ from flask_cors import CORS
 from models import db, Posting, User, Application
 from dotenv import load_dotenv
 from marshmallow import Schema, fields, ValidationError, validate
+from flask_limiter import Limiter 
+from flask_limiter.util import get_remote_address 
 
 load_dotenv()
 app = Flask(__name__)
@@ -21,6 +23,7 @@ db.init_app(app)
 bcrypt = Bcrypt(app)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY') 
 jwt = JWTManager(app)
+limiter = Limiter( get_remote_address, app=app, default_limits=["200 per day", "50 per hour"] )
 
 with app.app_context():
     db.create_all()
@@ -99,7 +102,8 @@ def delete_posting(posting_id):
     db.session.commit() 
     return jsonify({"message": "Posting deleted"})
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['POST']) 
+@limiter.limit("5 per minute") 
 def register():
     data = request.get_json()
     try:
@@ -123,7 +127,8 @@ def register():
     return jsonify({"message": "User registered", "id": new_user.id}), 201
 
 @app.route('/login', methods=['POST']) 
-def login(): 
+@limiter.limit("5 per minute") 
+def login():
     data = request.get_json() 
     user = User.query.filter_by(email=data['email']).first() 
     if not user or not bcrypt.check_password_hash(user.password_hash, data['password']): 
