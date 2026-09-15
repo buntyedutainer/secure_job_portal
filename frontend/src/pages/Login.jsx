@@ -23,14 +23,20 @@ function Login() {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /><br />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} /><br />
-        <button type="submit">Login</button>
-      </form>
-      {message && <p>{message}</p>}
+    <div className="max-w-md mx-auto mt-16 px-6">
+      <div className="bg-white shadow-md rounded-xl p-8 border border-gray-100">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Welcome back</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg shadow font-medium transition">
+            Login
+          </button>
+        </form>
+        {message && <p className="mt-4 text-center text-sm text-gray-600">{message}</p>}
+      </div>
     </div>
   );
 }
