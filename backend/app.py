@@ -147,6 +147,10 @@ def login():
     if not user: 
         logging.info(f"Failed login attempt for unknown email: {data.get('email')}") 
         return jsonify({"error": "Invalid email or password"}), 401 
+
+    if not user.is_active:
+        logging.warning(f"Login attempt on disabled account: {user.email}")
+        return jsonify({"error": "This account has been disabled"}), 403
     
     if user.locked_until and user.locked_until > datetime.utcnow(): 
         logging.warning(f"Login attempt on locked account: {user.email}") 
