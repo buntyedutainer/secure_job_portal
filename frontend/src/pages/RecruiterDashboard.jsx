@@ -14,9 +14,10 @@ function RecruiterDashboard() {
   const [form, setForm] = useState({ title: '', description: '', requirements: '', company_name: '' });
 
   const authHeaders = { headers: { Authorization: `Bearer ${token}` } };
+  const API = import.meta.env.VITE_API_URL;
 
   const fetchPostings = () => {
-    axios.get('http://localhost:5000/my-postings', authHeaders)
+    axios.get(`${API}/my-postings`, authHeaders)
       .then((res) => setPostings(res.data))
       .catch(() => setError('Could not load your postings'));
   };
@@ -38,9 +39,9 @@ function RecruiterDashboard() {
     e.preventDefault();
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/postings/${editingId}`, form, authHeaders);
+        await axios.put(`${API}/postings/${editingId}`, form, authHeaders);
       } else {
-        await axios.post('http://localhost:5000/postings', form, authHeaders);
+        await axios.post(`${API}/postings`, form, authHeaders);
       }
       resetForm();
       setShowForm(false);
@@ -63,7 +64,7 @@ function RecruiterDashboard() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this posting?')) return;
-    await axios.delete(`http://localhost:5000/postings/${id}`, authHeaders);
+    await axios.delete(`${API}/postings/${id}`, authHeaders);
     fetchPostings();
   };
 
@@ -72,7 +73,7 @@ function RecruiterDashboard() {
       setViewingApplicantsId(null);
       return;
     }
-    const res = await axios.get(`http://localhost:5000/postings/${id}/applicants`, authHeaders);
+    const res = await axios.get(`${API}/postings/${id}/applicants`, authHeaders);
     setApplicants(res.data);
     setViewingApplicantsId(id);
   };

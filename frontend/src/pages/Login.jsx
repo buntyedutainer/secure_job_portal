@@ -13,7 +13,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/login', { email, password });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, { email, password });
       login(response.data.access_token, response.data.role);
       setMessage('Login successful!');
       navigate('/postings');
@@ -24,18 +24,18 @@ function Login() {
 
   return (
     <div className="max-w-md mx-auto mt-16 px-6">
-      <div className="bg-white shadow-md rounded-xl p-8 border border-gray-100">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Welcome back</h1>
+      <div className="bg-white shadow-sm rounded-xl p-8 border border-line">
+        <h1 className="font-display text-2xl font-bold text-ink mb-6">Welcome back</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            className="w-full border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" />
           <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg shadow font-medium transition">
+            className="w-full border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" />
+          <button type="submit" className="w-full bg-accent hover:bg-accentdeep text-ink py-2.5 rounded-lg shadow-sm font-semibold transition">
             Login
           </button>
         </form>
-        {message && <p className="mt-4 text-center text-sm text-gray-600">{message}</p>}
+        {message && <p className="mt-4 text-center text-sm text-ink/60">{message}</p>}
       </div>
     </div>
   );

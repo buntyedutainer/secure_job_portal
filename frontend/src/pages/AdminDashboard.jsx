@@ -9,12 +9,13 @@ function AdminDashboard() {
   const [error, setError] = useState('');
 
   const authHeaders = { headers: { Authorization: `Bearer ${token}` } };
+  const API = import.meta.env.VITE_API_URL;
 
   const fetchData = () => {
-    axios.get('http://localhost:5000/admin/postings', authHeaders)
+    axios.get(`${API}/admin/postings`, authHeaders)
       .then((res) => setPostings(res.data))
       .catch(() => setError('Could not load postings'));
-    axios.get('http://localhost:5000/admin/users', authHeaders)
+    axios.get(`${API}/admin/users`, authHeaders)
       .then((res) => setUsers(res.data))
       .catch(() => setError('Could not load users'));
   };
@@ -25,12 +26,12 @@ function AdminDashboard() {
 
   const togglePostingStatus = async (posting) => {
     const newStatus = posting.status === 'open' ? 'closed' : 'open';
-    await axios.put(`http://localhost:5000/admin/postings/${posting.id}/status`, { status: newStatus }, authHeaders);
+    await axios.put(`${API}/admin/postings/${posting.id}/status`, { status: newStatus }, authHeaders);
     fetchData();
   };
 
   const toggleUserActive = async (userId) => {
-    await axios.put(`http://localhost:5000/admin/users/${userId}/toggle-active`, {}, authHeaders);
+    await axios.put(`${API}/admin/users/${userId}/toggle-active`, {}, authHeaders);
     fetchData();
   };
 

@@ -12,7 +12,7 @@ function PostingDetail() {
 
   const handleApply = async () => {
     try {
-      await axios.post('http://localhost:5000/applications',
+      await axios.post(`${import.meta.env.VITE_API_URL}/applications`,
         { posting_id: id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -23,7 +23,7 @@ function PostingDetail() {
   };
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/postings/${id}`)
+    axios.get(`${import.meta.env.VITE_API_URL}/postings/${id}`)
       .then((response) => setPosting(response.data))
       .catch(() => setError('Posting not found'));
   }, [id]);

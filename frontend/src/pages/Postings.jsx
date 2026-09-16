@@ -7,7 +7,7 @@ function Postings() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:5000/postings')
+    axios.get(`${import.meta.env.VITE_API_URL}/postings`)
       .then((response) => setPostings(response.data))
       .catch(() => setError('Could not load postings'));
   }, []);

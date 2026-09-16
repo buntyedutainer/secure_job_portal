@@ -10,7 +10,7 @@ function MyApplications() {
 
   useEffect(() => {
     if (!token) return;
-    axios.get('http://localhost:5000/my-applications', {
+    axios.get(`${import.meta.env.VITE_API_URL}/my-applications`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then((response) => setApplications(response.data))
