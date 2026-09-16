@@ -32,7 +32,7 @@ bcrypt = Bcrypt(app)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY') 
 jwt = JWTManager(app)
 limiter = Limiter( get_remote_address, app=app, default_limits=["200 per day", "50 per hour"] )
-Talisman(app, force_https=False, content_security_policy={ 
+Talisman(app, force_https=os.getenv('RENDER') is not None, content_security_policy={
     'default-src': "'self'", 
     'script-src': "'self'", 
     'style-src': ["'self'", "'unsafe-inline'"] })
@@ -320,4 +320,4 @@ def admin_toggle_user(user_id):
         })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
