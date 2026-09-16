@@ -34,28 +34,31 @@ function AdminDashboard() {
     fetchData();
   };
 
-  if (!token) return <p className="p-6">Log in as an admin to view this page.</p>;
-  if (role !== 'admin') return <p className="p-6">Admin access only.</p>;
+  if (!token) return <p className="max-w-5xl mx-auto px-6 py-16 text-ink/60">Log in as an admin to view this page.</p>;
+  if (role !== 'admin') return <p className="max-w-5xl mx-auto px-6 py-16 text-ink/60">Admin access only.</p>;
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-10">
-      <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-      {error && <p className="text-red-600">{error}</p>}
+    <div className="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <h1 className="font-display text-3xl font-bold text-ink">Admin Dashboard</h1>
+      {error && <p className="text-rose-600">{error}</p>}
 
       <section>
-        <h2 className="text-xl font-semibold text-gray-700 mb-3">All Postings</h2>
+        <h2 className="font-display text-xl font-bold text-ink mb-4">All Postings</h2>
         <div className="space-y-3">
           {postings.map((p) => (
-            <div key={p.id} className="bg-white shadow rounded-xl p-4 border border-gray-100 flex justify-between items-center">
+            <div key={p.id} className="bg-white shadow-sm rounded-xl p-4 border border-line flex justify-between items-center">
               <div>
-                <p className="font-medium text-gray-800">{p.title}</p>
-                <p className="text-sm text-gray-500">{p.company_name}</p>
+                <p className="font-semibold text-ink">{p.title}</p>
+                <p className="text-sm text-ink/50">{p.company_name}</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${p.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${p.status === 'open' ? 'bg-accent/20 text-accentdeep' : 'bg-line text-ink/50'}`}>
                   {p.status}
                 </span>
-                <button onClick={() => togglePostingStatus(p)} className="text-sm bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg transition">
+                <button
+                  onClick={() => togglePostingStatus(p)}
+                  className={`text-sm px-3 py-1.5 rounded-lg transition ${p.status === 'open' ? 'text-rose-600 border border-rose-200 hover:bg-rose-50' : 'bg-accent hover:bg-accentdeep text-ink font-medium'}`}
+                >
                   {p.status === 'open' ? 'Reject' : 'Approve'}
                 </button>
               </div>
@@ -65,19 +68,22 @@ function AdminDashboard() {
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-gray-700 mb-3">All Users</h2>
+        <h2 className="font-display text-xl font-bold text-ink mb-4">All Users</h2>
         <div className="space-y-3">
           {users.map((u) => (
-            <div key={u.id} className="bg-white shadow rounded-xl p-4 border border-gray-100 flex justify-between items-center">
+            <div key={u.id} className="bg-white shadow-sm rounded-xl p-4 border border-line flex justify-between items-center">
               <div>
-                <p className="font-medium text-gray-800">{u.name} <span className="text-gray-400 text-sm">({u.role})</span></p>
-                <p className="text-sm text-gray-500">{u.email}</p>
+                <p className="font-semibold text-ink">{u.name} <span className="text-ink/40 text-sm font-normal">({u.role})</span></p>
+                <p className="text-sm text-ink/50">{u.email}</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`text-xs font-medium px-2 py-1 rounded-full ${u.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${u.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                   {u.is_active ? 'Active' : 'Disabled'}
                 </span>
-                <button onClick={() => toggleUserActive(u.id)} className="text-sm bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded-lg transition">
+                <button
+                  onClick={() => toggleUserActive(u.id)}
+                  className={`text-sm px-3 py-1.5 rounded-lg transition ${u.is_active ? 'text-rose-600 border border-rose-200 hover:bg-rose-50' : 'bg-accent hover:bg-accentdeep text-ink font-medium'}`}
+                >
                   {u.is_active ? 'Disable' : 'Enable'}
                 </button>
               </div>

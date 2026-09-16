@@ -29,6 +29,11 @@ function RecruiterDashboard() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const resetForm = () => {
+    setForm({ title: '', description: '', requirements: '', company_name: '' });
+    setEditingId(null);
+  };
+
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -37,9 +42,8 @@ function RecruiterDashboard() {
       } else {
         await axios.post('http://localhost:5000/postings', form, authHeaders);
       }
-      setForm({ title: '', description: '', requirements: '', company_name: '' });
+      resetForm();
       setShowForm(false);
-      setEditingId(null);
       fetchPostings();
     } catch {
       setError('Could not save posting');
@@ -73,33 +77,33 @@ function RecruiterDashboard() {
     setViewingApplicantsId(id);
   };
 
-  if (!token) return <p className="p-6">Log in as a recruiter to view your dashboard.</p>;
+  if (!token) return <p className="max-w-4xl mx-auto px-6 py-16 text-ink/60">Log in as a recruiter to view your dashboard.</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Recruiter Dashboard</h1>
+    <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="font-display text-3xl font-bold text-ink">Recruiter Dashboard</h1>
         <button
-          onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ title: '', description: '', requirements: '', company_name: '' }); }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition"
+          onClick={() => { setShowForm(!showForm); resetForm(); }}
+          className="bg-accent hover:bg-accentdeep text-ink font-semibold px-5 py-2.5 rounded-lg shadow-sm transition"
         >
           {showForm ? 'Cancel' : '+ New Posting'}
         </button>
       </div>
 
-      {error && <p className="text-red-600 mb-4">{error}</p>}
+      {error && <p className="text-rose-600 mb-4">{error}</p>}
 
       {showForm && (
-        <form onSubmit={handleCreateOrUpdate} className="bg-white shadow-md rounded-xl p-6 mb-6 space-y-4 border border-gray-100">
+        <form onSubmit={handleCreateOrUpdate} className="bg-white shadow-sm rounded-xl p-6 mb-6 space-y-4 border border-line">
           <input name="title" value={form.title} onChange={handleFormChange} placeholder="Job Title"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+            className="w-full border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" required />
           <input name="company_name" value={form.company_name} onChange={handleFormChange} placeholder="Company Name"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+            className="w-full border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" required />
           <textarea name="description" value={form.description} onChange={handleFormChange} placeholder="Description"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" rows="3" required />
+            className="w-full border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" rows="3" required />
           <textarea name="requirements" value={form.requirements} onChange={handleFormChange} placeholder="Requirements"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" rows="2" />
-          <button type="submit" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition">
+            className="w-full border border-line rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent" rows="2" />
+          <button type="submit" className="bg-ink hover:bg-ink/90 text-paper font-semibold px-5 py-2.5 rounded-lg transition">
             {editingId ? 'Update Posting' : 'Create Posting'}
           </button>
         </form>
@@ -107,34 +111,34 @@ function RecruiterDashboard() {
 
       <div className="space-y-4">
         {postings.map((p) => (
-          <div key={p.id} className="bg-white shadow rounded-xl p-5 border border-gray-100 hover:shadow-lg transition">
+          <div key={p.id} className="bg-white shadow-sm rounded-xl p-5 border border-line hover:shadow-md transition">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-xl font-semibold text-gray-800">{p.title}</h2>
-                <p className="text-gray-500">{p.company_name}</p>
-                <span className={`inline-block mt-2 text-xs font-medium px-2 py-1 rounded-full ${p.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                <h2 className="font-display font-bold text-lg text-ink">{p.title}</h2>
+                <p className="text-ink/50 text-sm">{p.company_name}</p>
+                <span className={`inline-block mt-2 text-xs font-semibold px-2.5 py-1 rounded-full ${p.status === 'open' ? 'bg-accent/20 text-accentdeep' : 'bg-line text-ink/50'}`}>
                   {p.status}
                 </span>
               </div>
-              <div className="space-x-2">
-                <button onClick={() => handleEdit(p)} className="text-sm bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg transition">Edit</button>
-                <button onClick={() => handleDelete(p.id)} className="text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition">Delete</button>
-                <button onClick={() => handleViewApplicants(p.id)} className="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg transition">
+              <div className="flex gap-2">
+                <button onClick={() => handleEdit(p)} className="text-sm border border-line text-ink hover:bg-line/40 px-3 py-1.5 rounded-lg transition">Edit</button>
+                <button onClick={() => handleDelete(p.id)} className="text-sm text-rose-600 border border-rose-200 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition">Delete</button>
+                <button onClick={() => handleViewApplicants(p.id)} className="text-sm bg-ink hover:bg-ink/90 text-paper px-3 py-1.5 rounded-lg transition">
                   {viewingApplicantsId === p.id ? 'Hide Applicants' : 'View Applicants'}
                 </button>
               </div>
             </div>
 
             {viewingApplicantsId === p.id && (
-              <div className="mt-4 border-t pt-4">
+              <div className="mt-4 border-t border-line pt-4">
                 {applicants.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No applicants yet.</p>
+                  <p className="text-ink/40 text-sm">No applicants yet.</p>
                 ) : (
                   <ul className="space-y-2">
                     {applicants.map((a) => (
-                      <li key={a.application_id} className="text-sm text-gray-700 flex justify-between">
+                      <li key={a.application_id} className="text-sm text-ink/70 flex justify-between">
                         <span>{a.student_name} ({a.student_email})</span>
-                        <span className="text-gray-500">{a.status}</span>
+                        <span className="text-ink/40">{a.status}</span>
                       </li>
                     ))}
                   </ul>
@@ -143,6 +147,11 @@ function RecruiterDashboard() {
             )}
           </div>
         ))}
+        {postings.length === 0 && (
+          <div className="bg-white border border-line border-dashed rounded-xl p-10 text-center">
+            <p className="text-ink/50">You haven't posted any jobs yet. Click '+ New Posting' to get started.</p>
+          </div>
+        )}
       </div>
     </div>
   );

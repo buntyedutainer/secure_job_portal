@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
-      <div>
+      <div className="animate-fadeInUp">
         <p className="text-accentdeep font-semibold text-sm uppercase tracking-wide mb-3">For students & recruiters</p>
         <h1 className="font-display text-5xl font-extrabold text-ink leading-tight mb-6">
           Find your next <span className="text-accent">opportunity</span>, faster.
@@ -22,17 +22,17 @@ function Home() {
       </div>
 
       <div className="relative h-72 hidden md:block">
-        <div className="absolute top-4 left-8 w-64 bg-white border border-line rounded-xl shadow-md p-4 rotate-[-6deg]">
+        <div className="absolute top-4 left-8 w-64 bg-white border border-line rounded-xl shadow-md p-4 rotate-[-6deg] animate-float" style={{ animationDelay: '0s' }}>
           <p className="text-xs text-accentdeep font-semibold mb-1">RECRUITER</p>
           <p className="font-display font-bold text-ink">Frontend Intern</p>
           <p className="text-sm text-ink/50">TechNova Pvt Ltd</p>
         </div>
-        <div className="absolute top-16 left-24 w-64 bg-white border border-line rounded-xl shadow-lg p-4 rotate-[3deg]">
+        <div className="absolute top-16 left-24 w-64 bg-white border border-line rounded-xl shadow-lg p-4 rotate-[3deg] animate-float" style={{ animationDelay: '0.7s' }}>
           <p className="text-xs text-accentdeep font-semibold mb-1">OPEN</p>
           <p className="font-display font-bold text-ink">Backend Developer</p>
           <p className="text-sm text-ink/50">CloudWorks Inc.</p>
         </div>
-        <div className="absolute top-32 left-12 w-64 bg-white border border-line rounded-xl shadow-xl p-4 rotate-[-2deg]">
+        <div className="absolute top-32 left-12 w-64 bg-white border border-line rounded-xl shadow-xl p-4 rotate-[-2deg] animate-float" style={{ animationDelay: '1.4s' }}>
           <p className="text-xs text-accentdeep font-semibold mb-1">NEW</p>
           <p className="font-display font-bold text-ink">Data Analyst</p>
           <p className="text-sm text-ink/50">Insight Labs</p>

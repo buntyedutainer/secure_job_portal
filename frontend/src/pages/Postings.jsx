@@ -21,7 +21,7 @@ function Postings() {
           <Link
             key={p.id}
             to={`/postings/${p.id}`}
-            className="block bg-white border border-line rounded-xl p-5 shadow-sm hover:shadow-md hover:border-ink/20 transition"
+            className="block bg-white border border-line rounded-xl p-5 shadow-sm hover:shadow-md hover:border-ink/20 hover:scale-[1.01] transition"
           >
             <div className="flex justify-between items-start">
               <div>
