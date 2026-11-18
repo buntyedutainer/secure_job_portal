@@ -83,7 +83,7 @@ This project treats security as a first-class concern, not an afterthought. See 
 
 ## Project report
 
-A sample project report has been added for students reference. Student must prepare their project report as per the format prescribed by their respective colleges
+A sample project report has been added for students reference. See ['Sample project report.docx'](./Sample project report.docx). Student must prepare their project report as per the format prescribed by their respective colleges
 
 ## Author
 
