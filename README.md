@@ -81,6 +81,10 @@ pytest
 
 This project treats security as a first-class concern, not an afterthought. See [`SECURITY.md`](./SECURITY.md) for the full breakdown of authentication, authorization, input validation, rate limiting, account lockout, secrets management, secure headers, and logging implemented throughout.
 
+## Project report
+
+A sample project report has been added for students reference. Student must prepare their project report as per the format prescribed by their respective colleges
+
 ## Author
 
 Built by Bunty as a hands-on portfolio project while transitioning into a full-stack/security-conscious development role.
